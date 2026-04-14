@@ -1,0 +1,23 @@
+# Configure em: Repositório → Settings → Secrets and variables → Actions
+# Crie o secret DEPLOY_WEBHOOK_URL com o URL completo do deploy (inclui o token no path).
+
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar webhook de deploy
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_WEBHOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_URL" ]; then
+            echo "::error::Defina o secret DEPLOY_WEBHOOK_URL nas configurações do repositório (Actions secrets)."
+            exit 1
+          fi
+          curl -fsS -X POST "$DEPLOY_URL"
